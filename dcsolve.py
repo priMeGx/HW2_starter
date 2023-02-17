@@ -1,5 +1,5 @@
 """ Find the lowest cost way to transform a three or four letter word into another by changing one
-letter at a time so that all of the `qintervening strings are legal English words.  The cost of a
+letter at a time so that all of the intervening strings are legal English words. The cost of a
 replacement letter can be 1 (steps), based on scrabble values (scrabble), or based on the resulting
 words frequency in normal text (frequency) """
 

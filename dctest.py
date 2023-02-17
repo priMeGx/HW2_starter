@@ -1,4 +1,4 @@
-""" Calls your dc searcher with a eight examples, one of which shiould
+""" Calls your dc searcher with a eight examples, one of which should
 have no solution """
 
 from dcsolve import dcsolver
