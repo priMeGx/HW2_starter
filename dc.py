@@ -8,7 +8,8 @@ import gzip         # read from a gzip'd file
 #   and     0.07358445
 #   for     0.18200336
 
-dict_file = "words34.txt.gz"
+#REMEMBER TO CHANGE THIS BACK TO .txt.gz!
+dict_file = "words34.txt"
 
 # dictionary is a dict to hold legal 3 and 4 letter words with their
 # frequencies based on a sample of a large text corpus. The dict's
@@ -16,7 +17,8 @@ dict_file = "words34.txt.gz"
 
 # load words into the dictionary dict
 dictionary = {}
-for line in gzip.open(dict_file, 'rt'):
+#for line in gzip.open(dict_file, 'rt'):
+for line in open(dict_file, 'rt'):
     word, n = line.strip().split('\t')
     n = float(n)
     dictionary[word] = n
@@ -32,10 +34,35 @@ class DC(search.Problem):
        """
 
     def __init__(self, initial='dog', goal='cat', cost='steps'):
-        # set instance attributes ...
-        pass
+        initialInList = False
+        goalInList = False
+        passed = True
+        print("Initial is currently", initial)
+        print("Goal is currently", goal)
         # make sure arguments are legal, raising an error if any are bad.
-        pass
+        if (len(initial) != 3 and len(initial) != 4):
+            print("The initial word is not the right length (3 or 4)!")
+            passed = False
+        if (len(goal) != 3 and len(goal) != 4):
+            print("The goal word is not the right length (3 or 4)!")
+            passed = False
+        if (len(goal) != len(initial)):
+            print("The words are of different lengths!")
+            passed = False
+        if (cost != "steps" and cost != "scrabble" and cost != "frequency"):
+                print("The cost could not be intepreted (steps, scrabble, or frequency.")
+                passed = False;
+        if (passed):
+            for word in dictionary:
+                if (word == initial):
+                    initialInList = True
+                if (word == goal):
+                    goalInList = True
+        # set instance attributes ...
+        if (initialInList and goalInList):
+            self.initial = initial;
+            self.goal = goal;
+            self.cost = cost;
 
     def actions(self, state):
         """ Given a state (i.e., a word), return a list or iterator of
@@ -44,16 +71,36 @@ class DC(search.Problem):
         result must be a legal word, i.e., in our dictionary, and it
         should not be the same as the state, i.e., don't replace a
         character with the same character """
-
+        
+        """
+        So I see a few ways of doing this, but I should probably be looking at
+        lecture notes. Our options can be:
+            -Go letter by letter (26 * 3), change the word and 
+             check if it's in the list
+            -Go through the list, figure out if a letter has been changed, from
+            the current state and if so, add it
+        
+        """
+        nextOptions = []
+        iterator_next = iter(state)
+        for wordIndex in range(0, len(state)):
+            for letterIndex in range(0,26):
+                newWord = state;
+                newWord = chr(letterIndex + 97) + newWord[1:]
+                
+        
         pass
 
     def result(self, state, action):
         """ takes a state and an action and returns a new state """
-        pass
+        return action
 
     def goal_test(self, state):
-        """ returns True iff state is a goal state for this problem instance """
-        pass
+        """ returns True if state is a goal state for this problem instance """
+        if isinstance(self.goal, list):
+            return is_in(state, self.goal)
+        else:
+            return state == self.goal
 
     def path_cost(self, c, state1, action, state2):
         """ Returns the cost to get to state2 by applying action in
@@ -61,11 +108,37 @@ class DC(search.Problem):
         state1. For the the dc problem, you will have to check what
         cost metric (self.cost) is being used for this problem instance,
         i.e., is it steps, scrabble or frequency """
-        pass
+        if (self.cost == 'steps'):
+            print("It's steps!")
+            return c + 1
+        elif (self.cost == 'scrabble'):
+            print("It's scrabble!")
+            for index in range(0, len(state1)):
+                if (state1[index] != state2[index]):
+                    if (state2[index] in {'a','e','i','o','u','r','s','t','l','n',}):
+                        return c + 1 + 1
+                    elif (state2[index] in {'d', 'g'}):
+                        return c + 1 + 2
+                    elif (state2[index] in {'b','c','m','p'}):
+                        return c + 1 + 3
+                    elif (state2[index] in {'f','h','v','w','y'}):
+                        return c + 1 + 4
+                    elif (state2[index] in {'k'}):
+                        return c + 1 + 5
+                    elif (state2[index] in {'j','x'}):
+                        return c + 1 + 6
+                    elif (state2[index] in {'z','q'}):
+                        return c + 1 + 10
+        elif (self.cost == 'frequency'):
+            print("It's frequency!")
+            return c + 1 + dictionary[state2]
+        
 
     def __repr__(self):
         """" return a suitable string to represent this problem instance """
-        pass
+        for item in list:
+            print(item, " ")
+        #Print out the list? Example does it with spaces instead of line break
 
     def h(self, node):
         """Heuristic: returns an estimate of the cost to get from the
@@ -73,4 +146,12 @@ class DC(search.Problem):
         depend on the Problem's cost parameter, self.cost (i.e., steps, scrabble
         or frequency), as this will effect the estimate cost to get to
         the nearest goal. """
-        pass
+        if (self.cost == 'steps'):
+            print("It's steps!")
+            return 2
+        elif (self.cost == 'scrabble'):
+            print("It's scrabble!")
+            return 3
+        elif (self.cost == 'frequency'):
+            print("It's frequency!")
+            return 4
