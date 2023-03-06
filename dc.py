@@ -11,7 +11,7 @@ import gzip         # read from a gzip'd file
 #   for     0.18200336
 
 #REMEMBER TO CHANGE THIS BACK TO .txt.gz!
-dict_file = "words34.txt"
+dict_file = "words34.txt.gz"
 
 # dictionary is a dict to hold legal 3 and 4 letter words with their
 # frequencies based on a sample of a large text corpus. The dict's
