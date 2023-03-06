@@ -1,3 +1,5 @@
+            
+
 """ starter file for hw2: dogcat """
 
 import search       # AIMA module for search problems
@@ -17,8 +19,8 @@ dict_file = "words34.txt"
 
 # load words into the dictionary dict
 dictionary = {}
-#for line in gzip.open(dict_file, 'rt'):
-for line in open(dict_file, 'rt'):
+for line in gzip.open(dict_file, 'rt'):
+#for line in open(dict_file, 'rt'):
     word, n = line.strip().split('\t')
     n = float(n)
     dictionary[word] = n
@@ -37,8 +39,6 @@ class DC(search.Problem):
         initialInList = False
         goalInList = False
         passed = True
-        print("Initial is currently", initial)
-        print("Goal is currently", goal)
         # make sure arguments are legal, raising an error if any are bad.
         if (len(initial) != 3 and len(initial) != 4):
             print("The initial word is not the right length (3 or 4)!")
@@ -72,24 +72,15 @@ class DC(search.Problem):
         should not be the same as the state, i.e., don't replace a
         character with the same character """
         
-        """
-        So I see a few ways of doing this, but I should probably be looking at
-        lecture notes. Our options can be:
-            -Go letter by letter (26 * 3), change the word and 
-             check if it's in the list
-            -Go through the list, figure out if a letter has been changed, from
-            the current state and if so, add it
-        
-        """
-        nextOptions = []
+        nextOptions = {}
         iterator_next = iter(state)
         for wordIndex in range(0, len(state)):
             for letterIndex in range(0,26):
                 newWord = state;
-                newWord = chr(letterIndex + 97) + newWord[1:]
-                
-        
-        pass
+                newWord = newWord[:wordIndex] + chr(letterIndex + 97) + newWord[wordIndex+1:]
+                if newWord in dictionary and newWord != state:
+                    nextOptions[newWord] = dictionary[newWord]
+        return nextOptions
 
     def result(self, state, action):
         """ takes a state and an action and returns a new state """
@@ -108,36 +99,41 @@ class DC(search.Problem):
         state1. For the the dc problem, you will have to check what
         cost metric (self.cost) is being used for this problem instance,
         i.e., is it steps, scrabble or frequency """
+        wordsDiff = False;
+        for index in range(0, len(state1)):
+            if (state1[index] != state2[index]):
+                wordsDiff = True
+        if not wordsDiff:
+            return 0
         if (self.cost == 'steps'):
-            print("It's steps!")
+            #print("It's steps!")
             return c + 1
         elif (self.cost == 'scrabble'):
-            print("It's scrabble!")
             for index in range(0, len(state1)):
                 if (state1[index] != state2[index]):
-                    if (state2[index] in {'a','e','i','o','u','r','s','t','l','n',}):
-                        return c + 1 + 1
+                    if (state2[index] in {'a','e','i','o','u','r','s','t','l','n'}):
+                        return c + 1
                     elif (state2[index] in {'d', 'g'}):
-                        return c + 1 + 2
+                        return c + 2
                     elif (state2[index] in {'b','c','m','p'}):
-                        return c + 1 + 3
+                        return c + 3
                     elif (state2[index] in {'f','h','v','w','y'}):
-                        return c + 1 + 4
+                        return c + 4
                     elif (state2[index] in {'k'}):
-                        return c + 1 + 5
+                        return c + 5
                     elif (state2[index] in {'j','x'}):
-                        return c + 1 + 6
+                        return c + 6
                     elif (state2[index] in {'z','q'}):
-                        return c + 1 + 10
+                        return c + 10
+                    
         elif (self.cost == 'frequency'):
-            print("It's frequency!")
-            return c + 1 + dictionary[state2]
+            #print("It's frequency!")
+            return c + 1 + dictionary[action]
         
 
     def __repr__(self):
         """" return a suitable string to represent this problem instance """
-        for item in list:
-            print(item, " ")
+        return f"dc({self.initial},{self.goal},{self.cost}"
         #Print out the list? Example does it with spaces instead of line break
 
     def h(self, node):
@@ -147,11 +143,35 @@ class DC(search.Problem):
         or frequency), as this will effect the estimate cost to get to
         the nearest goal. """
         if (self.cost == 'steps'):
-            print("It's steps!")
-            return 2
+            #print("It's steps! in H")
+            diffCount = 0;
+            for index in range(len(self.goal)):
+                if(node.state[index] != self.goal[index]):
+                    diffCount += 1;
+            return diffCount;
         elif (self.cost == 'scrabble'):
-            print("It's scrabble!")
-            return 3
+            #print("It's scrabble! in H")
+            diffCount = 0;
+            for index in range(len(self.goal)):
+                if(node.state[index] != self.goal[index]):
+                    if (self.goal[index] in {'a','e','i','o','u','r','s','t','l','n',}):
+                        diffCount += 1
+                    elif (self.goal[index] in {'d', 'g'}):
+                        diffCount += 2
+                    elif (self.goal[index] in {'b','c','m','p'}):
+                        diffCount += 3
+                    elif (self.goal[index] in {'f','h','v','w','y'}):
+                        diffCount += 4
+                    elif (self.goal[index] in {'k'}):
+                        diffCount += 5
+                    elif (self.goal[index] in {'j','x'}):
+                        diffCount += 6
+                    elif (self.goal[index] in {'z','q'}):
+                        diffCount += 10    
+            return diffCount
         elif (self.cost == 'frequency'):
-            print("It's frequency!")
-            return 4
+            diffCount = 0;
+            for index in range(len(self.goal)):
+                if(node.state[index] != self.goal[index]):
+                    diffCount += 1;
+            return diffCount + dictionary[self.goal]
